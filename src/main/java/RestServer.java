@@ -9,7 +9,7 @@ public class RestServer {
 
     private static void defaultHandler(HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-        exchange.getResponseSender().send("Hello World");
+        exchange.getResponseSender().send("Welcome to Revolut Account transfer exercise");
     }
 
     public static void main(String[] args) {
