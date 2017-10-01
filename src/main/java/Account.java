@@ -42,7 +42,7 @@ class Account {
 
         if (transaction.getSourceAccId() == -1) transaction.setSuccessful(true);
 
-        transactions.add(transaction);
+        transactions.add(0, transaction);
     }
 
     void withdraw(Transaction transaction) throws Exception {
@@ -59,7 +59,7 @@ class Account {
 
         if (transaction.getDestAccId() == -1) transaction.setSuccessful(true);
 
-        transactions.add(transaction);
+        transactions.add(0, transaction);
     }
 
 
@@ -97,13 +97,8 @@ class Account {
         return "ERROR";
     }
 
-    static Account fromJson(String jsonAcc) {
+    static Account fromJson(String jsonAcc) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.readValue(jsonAcc, Account.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return mapper.readValue(jsonAcc, Account.class);
     }
 }

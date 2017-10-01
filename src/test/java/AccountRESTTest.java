@@ -114,7 +114,6 @@ public class AccountRESTTest {
 
 
 
-
         request = "{\n" +
                 "\"destAccId\": " + createdAccount.getId() + ",\n" +
                 "\"amount\": -5\n" +
@@ -143,5 +142,166 @@ public class AccountRESTTest {
 
         Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
         Assert.assertEquals("Invalid request: Please send destAccId and amount", response.getContentAsString());
+    }
+
+
+
+    @Test
+    public void accountWithdrawalHandler() throws Exception {
+        ContentResponse response = httpClient.GET("http://localhost:8080/account/create");
+        Account createdAccount = Account.fromJson(response.getContentAsString());
+        Request httpRequest = httpClient.POST("http://localhost:8080/account/deposit");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+        String request = "{\n" +
+                "\"destAccId\": " + createdAccount.getId() + ",\n" +
+                "\"amount\": 150\n" +
+                "}";
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        httpRequest.send();
+
+
+        httpRequest = httpClient.POST("http://localhost:8080/account/withdraw");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+        request = "{\n" +
+                "\"sourceAccId\": " + createdAccount.getId() + ",\n" +
+                "\"amount\": 15\n" +
+                "}";
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        response = httpRequest.send();
+
+        Account returnedAccount = Account.fromJson(response.getContentAsString());
+
+        String expectedResponse = "{\r\n" +
+                "  \"id\" : " + createdAccount.getId() + ",\r\n" +
+                "  \"balance\" : 135,\r\n" +
+                "  \"transactions\" : [ {\r\n" +
+                "    \"id\" : " + returnedAccount.getTransactions().get(0).getId() + ",\r\n" +
+                "    \"sourceAccId\" : "+ createdAccount.getId() +",\r\n" +
+                "    \"destAccId\" : -1,\r\n" +
+                "    \"amount\" : 15,\r\n" +
+                "    \"successful\" : true\r\n" +
+                "  }, {\r\n" +
+                "    \"id\" : " + returnedAccount.getTransactions().get(1).getId() + ",\r\n" +
+                "    \"sourceAccId\" : -1,\r\n" +
+                "    \"destAccId\" : " + createdAccount.getId() + ",\r\n" +
+                "    \"amount\" : 150,\r\n" +
+                "    \"successful\" : true\r\n" +
+                "  } ]\r\n" +
+                "}";
+        Assert.assertEquals(expectedResponse, response.getContentAsString());
+    }
+
+    @Test
+    public void accountWithdrawalHandler_badAccId() throws Exception {
+        Request httpRequest = httpClient.POST("http://localhost:8080/account/withdraw");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+
+        String request = "{\n" +
+                "\"sourceAccId\": 6754,\n" +
+                "\"amount\": 150\n" +
+                "}";
+
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        ContentResponse response = httpRequest.send();
+
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Error: Account doesn't exist", response.getContentAsString());
+    }
+
+
+
+    @Test
+    public void accountWithdrawalHandler_badWithdrawal() throws Exception {
+        //create an account
+        ContentResponse response = httpClient.GET("http://localhost:8080/account/create");
+        Account createdAccount = Account.fromJson(response.getContentAsString());
+        //deposit 150 in the account
+        Request httpRequest = httpClient.POST("http://localhost:8080/account/deposit");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+        String request = "{\n" +
+                "\"destAccId\": " + createdAccount.getId() + ",\n" +
+                "\"amount\": 150\n" +
+                "}";
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        httpRequest.send();
+
+        //withdraw 0
+        httpRequest = httpClient.POST("http://localhost:8080/account/withdraw");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+        request = "{\n" +
+                "\"sourceAccId\": " + createdAccount.getId() + ",\n" +
+                "\"amount\": 0\n" +
+                "}";
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        response = httpRequest.send();
+
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Invalid transaction: Withdrawal amount must be positive", response.getContentAsString());
+
+
+
+        //withdraw -59
+        httpRequest = httpClient.POST("http://localhost:8080/account/withdraw");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+        request = "{\n" +
+                "\"sourceAccId\": " + createdAccount.getId() + ",\n" +
+                "\"amount\": -59\n" +
+                "}";
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        response = httpRequest.send();
+
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Invalid transaction: Withdrawal amount must be positive", response.getContentAsString());
+
+
+        //withdraw 151
+        httpRequest = httpClient.POST("http://localhost:8080/account/withdraw");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+        request = "{\n" +
+                "\"sourceAccId\": " + createdAccount.getId() + ",\n" +
+                "\"amount\": 151\n" +
+                "}";
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        response = httpRequest.send();
+
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Insufficient funds", response.getContentAsString());
+    }
+
+
+
+    @Test
+    public void accountWithdrawalHandler_badRequest() throws Exception {
+        //create an account
+        ContentResponse response = httpClient.GET("http://localhost:8080/account/create");
+        Account createdAccount = Account.fromJson(response.getContentAsString());
+        //deposit 150 in the account
+        Request httpRequest = httpClient.POST("http://localhost:8080/account/deposit");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+        String request = "{\n" +
+                "\"destAccId\": " + createdAccount.getId() + ",\n" +
+                "\"amount\": 150\n" +
+                "}";
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        httpRequest.send();
+
+        //withdraw with no string in request
+        httpRequest = httpClient.POST("http://localhost:8080/account/withdraw");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+        request = "";
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        response = httpRequest.send();
+
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Invalid request: Please send sourceAccId and amount", response.getContentAsString());
     }
 }
