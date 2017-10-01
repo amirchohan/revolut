@@ -11,7 +11,8 @@ final class RestServer {
 
     private static final HttpHandler ROUTES = new RoutingHandler()
             .get("/", RestServer::defaultHandler)
-            .get("/account/create", AccountREST::createAccountHandler);
+            .get("/account/create", AccountREST::accountCreateHandler)
+            .post("/account/deposit", AccountREST::accountDepositHandler);
 
     private static void defaultHandler(HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");

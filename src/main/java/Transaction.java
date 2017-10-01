@@ -14,6 +14,7 @@ class Transaction {
     private boolean successful = false;
 
     public Transaction() {
+        this(0, 0, new BigDecimal("0"));
     }
 
     Transaction(int _sourceAccount, int _destAccount, BigDecimal _amount) {
