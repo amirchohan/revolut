@@ -1,4 +1,7 @@
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,8 +11,6 @@ class Account {
 
     private int id;
     private BigDecimal balance;
-
-    private boolean active;
     private List<Transaction> transactions;
 
     public Account() {
@@ -23,18 +24,9 @@ class Account {
         } while (DB.checkIfAccountExists(id));
 
         balance = _balance;
-        active = true;
         transactions = new LinkedList<>();
 
         DB.addAccount(this);
-    }
-
-    int getId() {
-        return this.id;
-    }
-
-    BigDecimal getBalance() {
-        return this.balance;
     }
 
     void deposit(Transaction transaction) throws Exception {
@@ -62,7 +54,27 @@ class Account {
         transactions.add(transaction);
     }
 
-    List<Transaction> getTransactions( ) {
+
+    public int getId() {
+        return this.id;
+    }
+
+    public BigDecimal getBalance() {
+        return this.balance;
+    }
+
+    public List<Transaction> getTransactions( ) {
         return transactions;
     }
+
+    String toJson() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "ERROR";
+    }
+
 }

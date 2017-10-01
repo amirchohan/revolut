@@ -1,3 +1,6 @@
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.math.BigDecimal;
 import java.util.Random;
 
@@ -7,7 +10,7 @@ class Transaction {
     private int sourceAccId;
     private int destAccId;
     private BigDecimal amount;
-    private boolean succesful = false;
+    private boolean successful = false;
 
     Transaction(int _sourceAccount, int _destAccount, BigDecimal _amount) {
         Random rand = new Random();
@@ -22,24 +25,24 @@ class Transaction {
         DB.addTransaction(this);
     }
 
-    int getId() {
+    public int getId() {
         return id;
     }
 
-    int getSourceAccId() {
+    public int getSourceAccId() {
         return sourceAccId;
     }
 
-    int getDestAccId() {
+    public int getDestAccId() {
         return destAccId;
     }
 
-    BigDecimal getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    boolean checkIfSuccesful() {
-        return succesful;
+    public boolean getSuccessful() {
+        return successful;
     }
 
     void execute() throws Exception {
@@ -47,6 +50,16 @@ class Transaction {
         Account destAcc = DB.getAccount(destAccId);
         sourceAcc.withdraw(this);
         destAcc.deposit(this);
-        succesful = true;
+        successful = true;
+    }
+
+    String toJson() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "ERROR";
     }
 }

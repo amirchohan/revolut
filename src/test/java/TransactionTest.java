@@ -59,6 +59,18 @@ public class TransactionTest {
         Assert.assertEquals(new BigDecimal("0.0"), acc_B.getBalance());
         Assert.assertFalse(acc_A.getTransactions().contains(trans_A));
         Assert.assertFalse(acc_B.getTransactions().contains(trans_A));
-        Assert.assertFalse(DB.getTransaction(trans_A.getId()).checkIfSuccesful());
+        Assert.assertFalse(DB.getTransaction(trans_A.getId()).getSuccessful());
+    }
+
+
+    @Test
+    public void toJson() throws Exception {
+        Transaction trans_A = new Transaction(acc_A.getId(), acc_B.getId(), new BigDecimal("9.1"));
+        String expectedJson = "{\"id\":"+trans_A.getId()+
+                ",\"sourceAccId\":"+trans_A.getSourceAccId()+
+                ",\"destAccId\":"+trans_A.getDestAccId()+
+                ",\"amount\":"+trans_A.getAmount()+
+                ",\"successful\":"+trans_A.getSuccessful()+"}";
+        Assert.assertEquals(expectedJson, trans_A.toJson());
     }
 }

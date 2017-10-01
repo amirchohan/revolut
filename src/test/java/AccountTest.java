@@ -146,4 +146,19 @@ public class AccountTest {
                 exp.getMessage());
     }
 
+
+    @Test
+    public void toJson() throws Exception {
+        Transaction transactionA = new Transaction(acc_A.getId(),-1, new BigDecimal("5.69"));
+        acc_A.withdraw(transactionA);
+        String expectedJson = "{\"id\":"+acc_A.getId()+
+                ",\"balance\":"+acc_A.getBalance()+
+                ",\"transactions\":[{\"id\":"+transactionA.getId()+
+                ",\"sourceAccId\":"+acc_A.getId()+
+                ",\"destAccId\":-1," +
+                "\"amount\":"+transactionA.getAmount()+
+                ",\"successful\":"+transactionA.getSuccessful()+"}]}";
+        Assert.assertEquals(expectedJson, acc_A.toJson());
+    }
+
 }
