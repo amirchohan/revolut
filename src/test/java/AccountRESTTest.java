@@ -1,3 +1,4 @@
+import io.undertow.util.Headers;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
@@ -30,6 +31,7 @@ public class AccountRESTTest {
     @Test
     public void accountCreateHandler() throws Exception {
         ContentResponse response = httpClient.GET("http://localhost:8080/account/create");
+        Assert.assertEquals("201", response.getHeaders().get(Headers.STATUS_STRING));
         Account createdAccount = Account.fromJson(response.getContentAsString());
 
         Assert.assertTrue(createdAccount.getId() > 0);
@@ -53,6 +55,7 @@ public class AccountRESTTest {
 
         httpRequest.content(new StringContentProvider(request), "application/json");
         response = httpRequest.send();
+        Assert.assertEquals("202", response.getHeaders().get(Headers.STATUS_STRING));
 
         Account returnedAccount = Account.fromJson(response.getContentAsString());
 
@@ -71,4 +74,74 @@ public class AccountRESTTest {
         Assert.assertEquals(expectedResponse, response.getContentAsString());
     }
 
+    @Test
+    public void accountDepositHandler_badAccId() throws Exception {
+        Request httpRequest = httpClient.POST("http://localhost:8080/account/deposit");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+
+        String request = "{\n" +
+                "\"destAccId\": 6754,\n" +
+                "\"amount\": 150\n" +
+                "}";
+
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        ContentResponse response = httpRequest.send();
+
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Error: Account doesn't exist", response.getContentAsString());
+    }
+
+    @Test
+    public void accountDepositHandler_badDeposit() throws Exception {
+        ContentResponse response = httpClient.GET("http://localhost:8080/account/create");
+        Account createdAccount = Account.fromJson(response.getContentAsString());
+
+        Request httpRequest = httpClient.POST("http://localhost:8080/account/deposit");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+
+        String request = "{\n" +
+                "\"destAccId\": " + createdAccount.getId() + ",\n" +
+                "\"amount\": 0\n" +
+                "}";
+
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        response = httpRequest.send();
+
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Invalid transaction: Deposit amount must be positive", response.getContentAsString());
+
+
+
+
+        request = "{\n" +
+                "\"destAccId\": " + createdAccount.getId() + ",\n" +
+                "\"amount\": -5\n" +
+                "}";
+
+        httpRequest = httpClient.POST("http://localhost:8080/account/deposit");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        response = httpRequest.send();
+
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Invalid transaction: Deposit amount must be positive", response.getContentAsString());
+    }
+
+    @Test
+    public void accountDepositHandler_badRequest() throws Exception {
+        Request httpRequest = httpClient.POST("http://localhost:8080/account/deposit");
+        httpRequest.header(HttpHeader.ACCEPT, "application/json");
+        httpRequest.header(HttpHeader.CONTENT_TYPE, "application/json");
+
+        String request = "";
+
+        httpRequest.content(new StringContentProvider(request), "application/json");
+        ContentResponse response = httpRequest.send();
+
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Invalid request: Please send destAccId and amount", response.getContentAsString());
+    }
 }

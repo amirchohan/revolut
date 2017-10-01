@@ -88,13 +88,8 @@ class Transaction {
         return "ERROR";
     }
 
-    static Transaction fromJson(String jsonTrans) {
+    static Transaction fromJson(String jsonTrans) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.readValue(jsonTrans, Transaction.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return mapper.readValue(jsonTrans, Transaction.class);
     }
 }

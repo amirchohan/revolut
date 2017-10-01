@@ -32,11 +32,11 @@ class Account {
     }
 
     void deposit(Transaction transaction) throws Exception {
-        if (transaction.getAmount().compareTo(BigDecimal.ZERO)<0)
+        if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0)
             throw new Exception("Invalid transaction: Deposit amount must be positive");
 
         if (transaction.getDestAccId() != this.getId())
-            throw new Exception("Invalid transaction: Destination Account ID doesn't match the account ID");
+            throw new Exception("Invalid transaction: Destination Account ID doesn't match the account ID (500)");
 
         balance = balance.add(transaction.getAmount());
 
