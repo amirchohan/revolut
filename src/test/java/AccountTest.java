@@ -151,14 +151,43 @@ public class AccountTest {
     public void toJson() throws Exception {
         Transaction transactionA = new Transaction(acc_A.getId(),-1, new BigDecimal("5.69"));
         acc_A.withdraw(transactionA);
-        String expectedJson = "{\"id\":"+acc_A.getId()+
-                ",\"balance\":"+acc_A.getBalance()+
-                ",\"transactions\":[{\"id\":"+transactionA.getId()+
-                ",\"sourceAccId\":"+acc_A.getId()+
-                ",\"destAccId\":-1," +
-                "\"amount\":"+transactionA.getAmount()+
-                ",\"successful\":"+transactionA.getSuccessful()+"}]}";
+        String expectedJson = "{\r\n" +
+                "  \"id\" : " + acc_A.getId() + ",\r\n" +
+                "  \"balance\" : "+ acc_A.getBalance() + ",\r\n" +
+                "  \"transactions\" : [ {\r\n" +
+                "    \"id\" : " + transactionA.getId() + ",\r\n" +
+                "    \"sourceAccId\" : " + acc_A.getId() +",\r\n" +
+                "    \"destAccId\" : -1,\r\n" +
+                "    \"amount\" : " + transactionA.getAmount() + ",\r\n" +
+                "    \"successful\" : " + transactionA.getSuccessful() + "\r\n" +
+                "  } ]\r\n" +
+                "}";
         Assert.assertEquals(expectedJson, acc_A.toJson());
     }
 
+    @Test
+    public void fromJson() throws Exception {
+        String stringJson = "{\r\n" +
+                "  \"id\" : 9856,\r\n" +
+                "  \"balance\" : 986537.06,\r\n" +
+                "  \"transactions\" : [ {\r\n" +
+                "    \"id\" : 127,\r\n" +
+                "    \"sourceAccId\" : -1,\r\n" +
+                "    \"destAccId\" : 9856,\r\n" +
+                "    \"amount\" : 986537.06,\r\n" +
+                "    \"successful\" : true\r\n" +
+                "  } ]\r\n" +
+                "}";
+        Account account = Account.fromJson(stringJson);
+
+        Assert.assertEquals(9856, account.getId());
+        Assert.assertEquals(new BigDecimal("986537.06"), account.getBalance());
+
+        Transaction transaction = account.getTransactions().get(0);
+        Assert.assertEquals(127, transaction.getId());
+        Assert.assertEquals(-1, transaction.getSourceAccId());
+        Assert.assertEquals(9856, transaction.getDestAccId());
+        Assert.assertEquals(new BigDecimal("986537.06"), transaction.getAmount());
+        Assert.assertEquals(true, transaction.getSuccessful());
+    }
 }

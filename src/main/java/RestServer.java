@@ -1,11 +1,17 @@
 import io.undertow.Undertow;
+import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
 
-public class RestServer {
+final class RestServer {
 
     private static int PORT = 8080;
     private static String HOSTNAME = "localhost";
+
+    private static final HttpHandler ROUTES = new RoutingHandler()
+            .get("/", RestServer::defaultHandler)
+            .get("/account/create", AccountREST::createAccountHandler);
 
     private static void defaultHandler(HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
@@ -14,7 +20,8 @@ public class RestServer {
 
     public static void main(String[] args) {
         Undertow server = Undertow.builder()
-                .addHttpListener(PORT, HOSTNAME, RestServer::defaultHandler)
+                .addHttpListener(PORT, HOSTNAME)
+                .setHandler(ROUTES)
                 .build();
         server.start();
     }

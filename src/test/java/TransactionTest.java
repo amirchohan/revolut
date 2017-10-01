@@ -66,11 +66,31 @@ public class TransactionTest {
     @Test
     public void toJson() throws Exception {
         Transaction trans_A = new Transaction(acc_A.getId(), acc_B.getId(), new BigDecimal("9.1"));
-        String expectedJson = "{\"id\":"+trans_A.getId()+
-                ",\"sourceAccId\":"+trans_A.getSourceAccId()+
-                ",\"destAccId\":"+trans_A.getDestAccId()+
-                ",\"amount\":"+trans_A.getAmount()+
-                ",\"successful\":"+trans_A.getSuccessful()+"}";
+        String expectedJson = "{\r\n" +
+                "  \"id\" : " + trans_A.getId() + ",\r\n" +
+                "  \"sourceAccId\" : " + acc_A.getId() + ",\r\n" +
+                "  \"destAccId\" : " + acc_B.getId() + ",\r\n" +
+                "  \"amount\" : " +trans_A.getAmount() + ",\r\n" +
+                "  \"successful\" : " + trans_A.getSuccessful() + "\r\n" +
+                "}";
         Assert.assertEquals(expectedJson, trans_A.toJson());
+    }
+
+    @Test
+    public void fromJson() throws Exception {
+        String jsonTrans = "{\r\n" +
+                "  \"id\" : 974217,\r\n" +
+                "  \"sourceAccId\" : 456,\r\n" +
+                "  \"destAccId\" : 789,\r\n" +
+                "  \"amount\" : 89.65,\r\n" +
+                "  \"successful\" : true\r\n" +
+                "}";
+        Transaction trans_A = Transaction.fromJson(jsonTrans);
+
+        Assert.assertEquals(974217, trans_A.getId());
+        Assert.assertEquals(456, trans_A.getSourceAccId());
+        Assert.assertEquals(789, trans_A.getDestAccId());
+        Assert.assertEquals(new BigDecimal("89.65"), trans_A.getAmount());
+        Assert.assertEquals(true, trans_A.getSuccessful());
     }
 }

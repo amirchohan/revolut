@@ -1,7 +1,9 @@
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +22,7 @@ class Account {
     Account(BigDecimal _balance) {
         Random rand = new Random();
         do {
-            id = rand.nextInt();
+            id = rand.nextInt(Integer.MAX_VALUE);
         } while (DB.checkIfAccountExists(id));
 
         balance = _balance;
@@ -37,6 +39,9 @@ class Account {
             throw new Exception("Invalid transaction: Destination Account ID doesn't match the account ID");
 
         balance = balance.add(transaction.getAmount());
+
+        if (transaction.getSourceAccId() == -1) transaction.setSuccessful(true);
+
         transactions.add(transaction);
     }
 
@@ -51,6 +56,9 @@ class Account {
             throw new Exception("Invalid transaction: Source Account ID doesn't match the account ID");
 
         balance = balance.subtract(transaction.getAmount());
+
+        if (transaction.getDestAccId() == -1) transaction.setSuccessful(true);
+
         transactions.add(transaction);
     }
 
@@ -59,22 +67,43 @@ class Account {
         return this.id;
     }
 
+    public void setId(int _id) {
+        id = _id;
+    }
+
     public BigDecimal getBalance() {
         return this.balance;
+    }
+
+    public void setBalance(BigDecimal _balance) {
+        balance = _balance;
     }
 
     public List<Transaction> getTransactions( ) {
         return transactions;
     }
 
+    public void setTransactions(List<Transaction> _transactions) {
+        transactions = _transactions;
+    }
+
     String toJson() {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.writeValueAsString(this);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
         return "ERROR";
     }
 
+    static Account fromJson(String jsonAcc) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(jsonAcc, Account.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
