@@ -31,6 +31,9 @@ class Transaction {
     }
 
     void execute() throws Exception {
+        if (this.amount.compareTo(BigDecimal.ZERO) <= 0)
+            throw new Exception("Invalid transaction: Transfer amount must be positive");
+
         Account sourceAcc = DB.getAccount(sourceAccId);
         Account destAcc = DB.getAccount(destAccId);
         sourceAcc.withdraw(this);

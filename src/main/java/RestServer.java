@@ -8,20 +8,27 @@ final class RestServer {
 
     private static int PORT = 8080;
     private static String HOSTNAME = "localhost";
+    private static Undertow server;
 
     private static final HttpHandler ROUTES = new RoutingHandler()
             .get("/", RestServer::defaultHandler)
             .get("/account/create", AccountREST::accountCreateHandler)
             .post("/account/deposit", AccountREST::accountDepositHandler)
-            .post("/account/withdraw", AccountREST::accountWithdrawalHandler);
+            .post("/account/withdraw", AccountREST::accountWithdrawalHandler)
+            .post("/transfer", TransferREST::transferHandler);
 
     private static void defaultHandler(HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
         exchange.getResponseSender().send("Welcome to Revolut Account transfer exercise");
     }
 
+    public static void stop() {
+        server.stop();
+    }
+
     public static void main(String[] args) {
-        Undertow server = Undertow.builder()
+        Account.createDemoAccounts(8);
+        server = Undertow.builder()
                 .addHttpListener(PORT, HOSTNAME)
                 .setHandler(ROUTES)
                 .build();

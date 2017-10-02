@@ -62,6 +62,15 @@ class Account {
         transactions.add(0, transaction);
     }
 
+    static void createDemoAccounts(int num) {
+        Random rand = new Random();
+        String stringBal;
+        for (int i=0; i < num; i++) {
+            stringBal = rand.nextInt(99999) + "." + rand.nextInt(99);
+            new Account(new BigDecimal(stringBal));
+        }
+    }
+
 
     public int getId() {
         return this.id;
