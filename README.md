@@ -18,6 +18,7 @@ The API is written in Java 8 and uses Undertow's embedded REST server.
 - List all transactions or accounts stored in the DB.
 - Get all transactions for a given account.
 - In-memory database to store all transactions and accounts.
+- Thread-safe
 - Error capturing and returning appropriate HTTP response codes.
 - Creation of accounts and transactions at runtime for demo.
 - Unit tests using TDD.
@@ -123,7 +124,7 @@ Finally, to get all the transactions in the DB simply submit the following GET r
 
 ### Future possible improvements
 - Using Mockito to perform unit testing using mocks
-- Make the progream thread safe
+- Make the program thread-safe on a more atomic level using locks
 - Implement logging
 - Support for different currencies
 - Transactions should have a timestamp

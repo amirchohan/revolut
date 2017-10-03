@@ -8,12 +8,16 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 class Account {
 
     private int id;
     private BigDecimal balance;
     private List<Transaction> transactions;
+
+    private Lock balanceLock = new ReentrantLock();
 
     public Account() {
         this(new BigDecimal(0));
@@ -31,31 +35,45 @@ class Account {
         DB.addAccount(this);
     }
 
-    void deposit(Transaction transaction) throws Exception {
-        if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0)
+    synchronized void deposit(Transaction transaction) throws Exception {
+        balanceLock.lock();
+        if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            balanceLock.unlock();
             throw new Exception("Invalid transaction: Deposit amount must be positive");
+        }
 
-        if (transaction.getDestAccId() != this.getId())
+        if (transaction.getDestAccId() != this.getId()) {
+            balanceLock.unlock();
             throw new Exception("Invalid transaction: Destination Account ID doesn't match the account ID (500)");
+        }
 
         balance = balance.add(transaction.getAmount());
+        balanceLock.unlock();
 
         if (transaction.getSourceAccId() == -1) transaction.setSuccessful(true);
 
         transactions.add(0, transaction);
     }
 
-    void withdraw(Transaction transaction) throws Exception {
-        if (balance.subtract(transaction.getAmount()).compareTo(BigDecimal.ZERO) < 0)
+    synchronized void withdraw(Transaction transaction) throws Exception {
+        balanceLock.lock();
+        if (balance.subtract(transaction.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
+            balanceLock.unlock();
             throw new Exception("Insufficient funds");
+        }
 
-        if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0)
+        if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            balanceLock.unlock();
             throw new Exception("Invalid transaction: Withdrawal amount must be positive");
+        }
 
-        if (transaction.getSourceAccId() != this.getId())
+        if (transaction.getSourceAccId() != this.getId()) {
+            balanceLock.unlock();
             throw new Exception("Invalid transaction: Source Account ID doesn't match the account ID");
+        }
 
         balance = balance.subtract(transaction.getAmount());
+        balanceLock.unlock();
 
         if (transaction.getDestAccId() == -1) transaction.setSuccessful(true);
 
@@ -78,7 +96,11 @@ class Account {
     }
 
     public BigDecimal getBalance() {
-        return this.balance;
+        BigDecimal bal;
+        balanceLock.lock();
+        bal = this.balance;
+        balanceLock.unlock();
+        return bal;
     }
 
     public void setBalance(BigDecimal _balance) {
@@ -145,7 +167,10 @@ class Account {
     }
 
     public void refundTransaction(Transaction transaction) {
+        balanceLock.lock();
         balance = balance.add(transaction.getAmount());
+        balanceLock.unlock();
+
         transactions.remove(transaction);
     }
 }
