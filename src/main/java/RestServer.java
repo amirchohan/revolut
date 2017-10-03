@@ -14,6 +14,7 @@ final class RestServer {
             .get("/", RestServer::defaultHandler)
             .get("/account/{accId}", AccountREST::getAccountHandler)
             .get("/account/create", AccountREST::accountCreateHandler)
+            .get("/accounts", AccountREST::getAccountsHandler)
             .post("/account/deposit", AccountREST::accountDepositHandler)
             .post("/account/withdraw", AccountREST::accountWithdrawalHandler)
             .post("/transfer", TransferREST::transferHandler)

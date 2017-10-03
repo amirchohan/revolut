@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Random;
 
 public class AccountRESTTest {
@@ -52,6 +53,15 @@ public class AccountRESTTest {
         Account fetchedAccount = Account.fromJson(response.getContentAsString());
 
         Assert.assertEquals(fetchedAccount, createdAccount);
+    }
+
+    @Test
+    public void getAccountsHandler() throws Exception {
+        ContentResponse response = httpClient.GET("http://localhost:8080/accounts");
+        Assert.assertEquals("200", response.getHeaders().get(Headers.STATUS_STRING));
+
+        List<Account> accountsList = Account.fromJsonList(response.getContentAsString());
+        Assert.assertTrue(accountsList.size() > 0);
     }
 
     @Test

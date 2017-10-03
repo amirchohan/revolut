@@ -10,6 +10,6 @@ class TransactionREST {
         exchange.getResponseHeaders().put(Headers.STATUS, 200);
 
         List<Transaction> transactions = DB.getTransactions();
-        exchange.getResponseSender().send(Transaction.ListToJson(transactions));
+        exchange.getResponseSender().send(Transaction.listToJson(transactions));
     }
 }

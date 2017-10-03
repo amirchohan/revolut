@@ -2,7 +2,9 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -121,5 +123,24 @@ class Account {
 
         return (this.getId() == otherAcc.getId()) &&
                 (this.getBalance().compareTo(otherAcc.getBalance()) == 0);
+    }
+
+    static List<Account> fromJsonList(String jsonString) throws IOException {
+        jsonString = jsonString.substring(16, jsonString.length()-1);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        return Arrays.asList(objectMapper.readValue(jsonString, Account[].class));
+    }
+
+    public static String listToJson(List<Account> accounts) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\r\n\"accounts\" : [\r\n");
+        for (Account acc : accounts) {
+            sb.append(acc.toJson());
+            sb.append(",\r\n");
+        }
+        sb.replace(sb.length()-3, sb.length(), "");
+        sb.append("\r\n]\r\n}");
+        return sb.toString();
     }
 }

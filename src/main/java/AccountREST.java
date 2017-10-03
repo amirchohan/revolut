@@ -1,6 +1,8 @@
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
+import java.util.List;
+
 class AccountREST {
 
     static void accountCreateHandler(HttpServerExchange exchange) {
@@ -9,7 +11,6 @@ class AccountREST {
         exchange.getResponseHeaders().put(Headers.STATUS, 201);
         exchange.getResponseSender().send(newAccount.toJson());
     }
-
 
     static void getAccountHandler(HttpServerExchange exchange) {
         try {
@@ -33,6 +34,15 @@ class AccountREST {
             exchange.getResponseHeaders().put(Headers.STATUS, 400);
             exchange.getResponseSender().send("Error: Please enter a valid account number");
         }
+    }
+
+
+    public static void getAccountsHandler(HttpServerExchange exchange) {
+        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        exchange.getResponseHeaders().put(Headers.STATUS, 200);
+
+        List<Account> accounts = DB.getAccounts();
+        exchange.getResponseSender().send(Account.listToJson(accounts));
     }
 
     static void accountDepositHandler(HttpServerExchange exchange) {

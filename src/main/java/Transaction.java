@@ -133,7 +133,7 @@ class Transaction {
         return mapper.readValue(jsonTrans, Transaction.class);
     }
 
-    static String ListToJson(List<Transaction> transactions) {
+    static String listToJson(List<Transaction> transactions) {
         StringBuilder sb = new StringBuilder();
         sb.append("{\r\n\"transactions\" : [\r\n");
         for (Transaction trans : transactions) {
