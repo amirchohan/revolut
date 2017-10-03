@@ -3,6 +3,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 class Transaction {
@@ -81,6 +83,41 @@ class Transaction {
         successful = status;
     }
 
+    public static void createDummyTransactions() {
+        List<Account> accounts = DB.getAccounts();
+
+        // deposit money into half of the accounts
+        for (int i=0; i < accounts.size(); i+=2 ) {
+            try {
+                accounts.get(i).deposit(
+                        new Transaction(-1, accounts.get(i).getId(), getRandomAmount(99999)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        //transfer money between accounts
+        for (int i=1; i < accounts.size(); i+=2 ) {
+            Account sourceAcc = accounts.get(i-1);
+            Account destAcc = accounts.get(i);
+
+            Transaction transaction = new Transaction(sourceAcc.getId(), destAcc.getId(),
+                    getRandomAmount(sourceAcc.getBalance().intValue()));
+            try {
+                transaction.execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public static BigDecimal getRandomAmount(int max) {
+        Random rand = new Random();
+        String stringBal = rand.nextInt(max) + "." + rand.nextInt(99);
+        return new BigDecimal(stringBal);
+    }
+
     String toJson() {
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -94,5 +131,24 @@ class Transaction {
     static Transaction fromJson(String jsonTrans) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(jsonTrans, Transaction.class);
+    }
+
+    static String ListToJson(List<Transaction> transactions) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\r\n\"transactions\" : [\r\n");
+        for (Transaction trans : transactions) {
+            sb.append(trans.toJson());
+            sb.append(",\r\n");
+        }
+        sb.replace(sb.length()-3, sb.length(), "");
+        sb.append("\r\n]\r\n}");
+        return sb.toString();
+    }
+
+    static List<Transaction> fromJsonList(String jsonString) throws IOException {
+        jsonString = jsonString.substring(20, jsonString.length()-1);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        return Arrays.asList(objectMapper.readValue(jsonString, Transaction[].class));
     }
 }

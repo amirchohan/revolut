@@ -16,7 +16,8 @@ final class RestServer {
             .get("/account/create", AccountREST::accountCreateHandler)
             .post("/account/deposit", AccountREST::accountDepositHandler)
             .post("/account/withdraw", AccountREST::accountWithdrawalHandler)
-            .post("/transfer", TransferREST::transferHandler);
+            .post("/transfer", TransferREST::transferHandler)
+            .get("/transactions", TransactionREST::getTransactionsHandler);
 
     private static void defaultHandler(HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
@@ -29,6 +30,8 @@ final class RestServer {
 
     public static void main(String[] args) {
         Account.createDemoAccounts(8);
+        Transaction.createDummyTransactions();
+
         server = Undertow.builder()
                 .addHttpListener(PORT, HOSTNAME)
                 .setHandler(ROUTES)

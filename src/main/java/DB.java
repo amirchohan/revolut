@@ -1,4 +1,6 @@
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 
 final class DB {
 
@@ -31,5 +33,13 @@ final class DB {
 
     static Transaction getTransaction(int transId) {
         return transactions.get(transId);
+    }
+
+    public static List<Transaction> getTransactions() {
+        return new LinkedList<>(transactions.values());
+    }
+
+    public static List<Account> getAccounts() {
+        return new LinkedList<>(accounts.values());
     }
 }

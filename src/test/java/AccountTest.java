@@ -53,7 +53,7 @@ public class AccountTest {
             exp = e;
         }
         Assert.assertEquals(
-                "Invalid transaction: Destination Account ID doesn't match the account ID",
+                "Invalid transaction: Destination Account ID doesn't match the account ID (500)",
                 exp.getMessage());
 
         exp = new Exception();
