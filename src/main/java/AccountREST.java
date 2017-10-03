@@ -21,6 +21,7 @@ class AccountREST {
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
                 exchange.getResponseHeaders().put(Headers.STATUS, 400);
                 exchange.getResponseSender().send("Error: Please enter a valid account number");
+                return;
             }
 
             Account requestedAccount = DB.getAccount(accId);
