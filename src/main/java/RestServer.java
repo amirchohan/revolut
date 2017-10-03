@@ -22,7 +22,8 @@ final class RestServer {
 
     private static void defaultHandler(HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-        exchange.getResponseSender().send("Welcome to Revolut Account transfer exercise");
+        exchange.getResponseSender().send("Welcome to Revolut Account transfer exercise.\n" +
+                "The API guide can be found at https://github.com/amirchohan/revolut");
     }
 
     public static void stop() {
@@ -35,10 +36,25 @@ final class RestServer {
             Transaction.createDummyTransactions();
         }
 
-        server = Undertow.builder()
-                .addHttpListener(PORT, HOSTNAME)
-                .setHandler(ROUTES)
-                .build();
-        server.start();
+        int numTries = 0;
+        int maxTries = 10;
+        while (numTries < maxTries) {
+            System.out.println("Trying to bind to port " + PORT);
+            try {
+                server = Undertow.builder()
+                        .addHttpListener(PORT, HOSTNAME)
+                        .setHandler(ROUTES)
+                        .build();
+                server.start();
+            } catch (RuntimeException e) {
+                System.out.println("Revolut Money transfer API server couldn't bind to port " + PORT);
+                PORT++;
+            } finally {
+                numTries = maxTries;
+                System.out.println("Revolut Money transfer API server is now running on http://"
+                        + HOSTNAME + ":" + PORT +"/");
+            }
+        }
+
     }
 }

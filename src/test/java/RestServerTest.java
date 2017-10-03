@@ -25,6 +25,8 @@ public class RestServerTest {
     @Test
     public void testRestServer() throws Exception {
         ContentResponse response = httpClient.GET("http://localhost:8080");
-        Assert.assertEquals("Welcome to Revolut Account transfer exercise", response.getContentAsString());
+        Assert.assertEquals("Welcome to Revolut Account transfer exercise.\n" +
+                        "The API guide can be found at https://github.com/amirchohan/revolut",
+                response.getContentAsString());
     }
 }
