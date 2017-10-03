@@ -30,7 +30,7 @@ The API is written in Java 8 and uses Undertow's embedded REST server.
 ## Using the REST API
 ### Accounts
 #### Creating an account  
-To create an account it's a simple GET request: `http://localhost:8080/account/create`.
+To create an account it's a simple GET request: `curl -XGET http://localhost:8080/account/create`.
 The server will respond with information about the created account in a JSON format:
 ```
 {
@@ -41,11 +41,11 @@ The server will respond with information about the created account in a JSON for
 ```
 
 #### Get an account
-To get information on an account you can submit a GET request with the account Id in as a parameter in the URL: `http://localhost:8080/account/accId=1775907950`.
+To get information on an account you can submit a GET request with the account Id in as a parameter in the URL: `curl -XGET http://localhost:8080/account/accId=1775907950`.
 The server will respond with information about the quered account, which in this case will be same as above.
 
 #### Get all accounts
-To get information on all the accounts simply submit the following GET request: `http://localhost:8080/accounts`  
+To get information on all the accounts simply submit the following GET request: `curl -XGET http://localhost:8080/accounts`  
 Example response:
 ```
 {
@@ -92,8 +92,8 @@ Example response:
 #### Deposit money
 You can deposit money into an account by making a POST request providing the account Id and the amount you wish to deposit:
 ```
-curl -XPOST http://localhost:8080/account/deposit -d
-'{
+curl -XPOST http://localhost:8080/account/deposit -d '
+{
   "destAccId" : 1791851470,
   "amount" : 180
 }'
@@ -101,9 +101,9 @@ curl -XPOST http://localhost:8080/account/deposit -d
 #### Withdraw money
 Similarly, you can withdraw money from an account by making a POST request providing the account Id and the amount you wish to withdraw:
 ```
-curl -XPOST http://localhost:8080/account/withdraw -d
-'{
-  "destAccId" : 1615791761,
+curl -XPOST http://localhost:8080/account/withdraw -d '
+{
+  "sourceAccId" : 1615791761,
   "amount" : 98.30
 }'
 ```
@@ -111,8 +111,8 @@ curl -XPOST http://localhost:8080/account/withdraw -d
 #### Transfer money
 To transfer money make a POST request providing the source account Id, destination account Id and the amount to transfer:
 ```
-curl -XPOST http://localhost:8080/transfer -d
-'{
+curl -XPOST http://localhost:8080/transfer -d '
+{
   "sourceAccId" : 1665399452,
   "destAccId" : 1615791761,
   "amount" : 98.30
@@ -120,7 +120,7 @@ curl -XPOST http://localhost:8080/transfer -d
 ```
 
 #### Get all transactions
-Finally, to get all the transactions in the DB simply submit the following GET request: `http://localhost:8080/transactions`
+Finally, to get all the transactions in the DB simply submit the following GET request: `curl -XGET http://localhost:8080/transactions`
 
 ### Future possible improvements
 - Using Mockito to perform unit testing using mocks
