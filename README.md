@@ -103,7 +103,7 @@ Similarly, you can withdraw money from an account by making a POST request provi
 ```
 curl -XPOST http://localhost:8080/account/withdraw -d '
 {
-  "destAccId" : 1615791761,
+  "sourceAccId" : 1615791761,
   "amount" : 98.30
 }'
 ```
