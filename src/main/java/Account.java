@@ -1,9 +1,7 @@
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,5 +107,22 @@ class Account {
     static Account fromJson(String jsonAcc) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(jsonAcc, Account.class);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+
+        if (o == null)
+            return false;
+
+        if (getClass() != o.getClass())
+            return false;
+
+        Account otherAcc = (Account) o;
+
+        return (this.getId() == otherAcc.getId()) &&
+                (this.getBalance().compareTo(otherAcc.getBalance()) == 0);
     }
 }

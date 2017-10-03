@@ -12,6 +12,7 @@ final class RestServer {
 
     private static final HttpHandler ROUTES = new RoutingHandler()
             .get("/", RestServer::defaultHandler)
+            .get("/account/{accId}", AccountREST::getAccountHandler)
             .get("/account/create", AccountREST::accountCreateHandler)
             .post("/account/deposit", AccountREST::accountDepositHandler)
             .post("/account/withdraw", AccountREST::accountWithdrawalHandler)

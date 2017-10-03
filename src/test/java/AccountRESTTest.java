@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.Random;
 
 public class AccountRESTTest {
 
@@ -24,6 +25,7 @@ public class AccountRESTTest {
 
     @After
     public void tearDown() throws Exception {
+        RestServer.stop();
         httpClient.stop();
     }
 
@@ -38,6 +40,37 @@ public class AccountRESTTest {
         Assert.assertEquals(new BigDecimal("0"), createdAccount.getBalance());
         Assert.assertTrue(createdAccount.getTransactions().size() == 0);
     }
+
+    @Test
+    public void getAccountHandler() throws Exception {
+        ContentResponse response = httpClient.GET("http://localhost:8080/account/create");
+        Assert.assertEquals("201", response.getHeaders().get(Headers.STATUS_STRING));
+        Account createdAccount = Account.fromJson(response.getContentAsString());
+
+        response = httpClient.GET("http://localhost:8080/account/accId="+createdAccount.getId());
+        Assert.assertEquals("200", response.getHeaders().get(Headers.STATUS_STRING));
+        Account fetchedAccount = Account.fromJson(response.getContentAsString());
+
+        Assert.assertEquals(fetchedAccount, createdAccount);
+    }
+
+    @Test
+    public void getAccountHandler_badAccount() throws Exception {
+        ContentResponse response = httpClient.GET("http://localhost:8080/account/");
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Error: Please enter a valid account number", response.getContentAsString());
+
+        Random rand = new Random();
+        int id;
+        do {
+            id = rand.nextInt(Integer.MAX_VALUE);
+        } while (DB.checkIfAccountExists(id));
+
+        response = httpClient.GET("http://localhost:8080/account/"+id);
+        Assert.assertEquals("400", response.getHeaders().get(Headers.STATUS_STRING));
+        Assert.assertEquals("Error: Please enter a valid account number", response.getContentAsString());
+    }
+
 
     @Test
     public void accountDepositHandler() throws Exception {

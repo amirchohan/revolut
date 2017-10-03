@@ -10,6 +10,31 @@ class AccountREST {
         exchange.getResponseSender().send(newAccount.toJson());
     }
 
+
+    static void getAccountHandler(HttpServerExchange exchange) {
+        try {
+            String stingAccId = exchange.getQueryParameters().get("accId").getFirst().split("=")[1];
+            int accId = Integer.parseInt(stingAccId);
+
+            if (!DB.checkIfAccountExists(accId)) {
+                exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                exchange.getResponseHeaders().put(Headers.STATUS, 400);
+                exchange.getResponseSender().send("Error: Please enter a valid account number");
+            }
+
+            Account requestedAccount = DB.getAccount(accId);
+
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+            exchange.getResponseHeaders().put(Headers.STATUS, 200);
+            exchange.getResponseSender().send(requestedAccount.toJson());
+        }
+        catch (Exception e) {
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+            exchange.getResponseHeaders().put(Headers.STATUS, 400);
+            exchange.getResponseSender().send("Error: Please enter a valid account number");
+        }
+    }
+
     static void accountDepositHandler(HttpServerExchange exchange) {
         exchange.getRequestReceiver().receiveFullString(((httpServerExchange, s) -> {
 
@@ -83,4 +108,5 @@ class AccountREST {
             }
         }));
     }
+
 }
