@@ -64,10 +64,10 @@ public class TransferRESTTest {
         ContentResponse response = httpRequest.send();
 
         Assert.assertEquals("202", response.getHeaders().get(Headers.STATUS_STRING));
-        Assert.assertTrue(response.getContentAsString().contains("sourceAcc: {\r\n  \"id\" : "+acc_A.getId()+",\r\n" +
-                "  \"balance\" : 135,"));
-        Assert.assertTrue(response.getContentAsString().contains("destAcc: {\r\n  \"id\" : "+acc_B.getId()+",\r\n" +
-                "  \"balance\" : 15,"));
+        Assert.assertTrue(response.getContentAsString().replace("\n", "").replace("\r", "")
+                .contains("sourceAcc: {  \"id\" : "+acc_A.getId()+",  \"balance\" : 135,"));
+        Assert.assertTrue(response.getContentAsString().replace("\n", "").replace("\r", "")
+                .contains("destAcc: {  \"id\" : "+acc_B.getId()+",  \"balance\" : 15,"));
     }
 
 

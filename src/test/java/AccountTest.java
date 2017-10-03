@@ -162,7 +162,8 @@ public class AccountTest {
                 "    \"successful\" : " + transactionA.getSuccessful() + "\r\n" +
                 "  } ]\r\n" +
                 "}";
-        Assert.assertEquals(expectedJson, acc_A.toJson());
+        Assert.assertEquals(expectedJson.replace("\n", "").replace("\r", ""),
+                acc_A.toJson().replace("\n", "").replace("\r", ""));
     }
 
     @Test

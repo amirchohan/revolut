@@ -115,7 +115,8 @@ public class AccountRESTTest {
                 "  } ]\r\n" +
                 "}";
 
-        Assert.assertEquals(expectedResponse, response.getContentAsString());
+        Assert.assertEquals(expectedResponse.replace("\n", "").replace("\r", ""),
+                response.getContentAsString().replace("\n", "").replace("\r", ""));
     }
 
     @Test
@@ -234,7 +235,8 @@ public class AccountRESTTest {
                 "    \"successful\" : true\r\n" +
                 "  } ]\r\n" +
                 "}";
-        Assert.assertEquals(expectedResponse, response.getContentAsString());
+        Assert.assertEquals(expectedResponse.replace("\n", "").replace("\r", ""),
+                response.getContentAsString().replace("\n", "").replace("\r", ""));
     }
 
     @Test

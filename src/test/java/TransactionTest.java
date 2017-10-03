@@ -73,7 +73,8 @@ public class TransactionTest {
                 "  \"amount\" : " +trans_A.getAmount() + ",\r\n" +
                 "  \"successful\" : " + trans_A.getSuccessful() + "\r\n" +
                 "}";
-        Assert.assertEquals(expectedJson, trans_A.toJson());
+        Assert.assertEquals(expectedJson.replace("\n", "").replace("\r", ""),
+                trans_A.toJson().replace("\n", "").replace("\r", ""));
     }
 
     @Test
