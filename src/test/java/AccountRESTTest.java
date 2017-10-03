@@ -19,7 +19,8 @@ public class AccountRESTTest {
 
     @Before
     public void setUp() throws Exception {
-        RestServer.main(null);
+        DB.cleanDB();
+        RestServer.main(new String[]{"-demo"});
         httpClient = new HttpClient();
         httpClient.start();
     }

@@ -22,9 +22,9 @@ The API is written in Java 8 and uses Undertow's embedded REST server.
 - Creation of accounts and transactions at runtime for demo.
 - Unit tests using TDD.
 
-## Starting the applicaiton
-1. Clone the repo and run the following command: `mvn package -Dmaven.test.skip=true`  
-2. This will create a single fat jar which can be executed: `java -jar target/revolut-1.0-SNAPSHOT-jar-with-dependencies.jar`
+## Starting the application
+1. Clone the repo and run the following command: `mvn package`
+2. This will create a single fat jar which can be executed with `java -jar target/revolut-1.0-SNAPSHOT-jar-with-dependencies.jar -demo`
 
 ## Using the REST API
 ### Accounts

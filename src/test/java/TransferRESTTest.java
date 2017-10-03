@@ -11,8 +11,6 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
-
 public class TransferRESTTest {
 
     private HttpClient httpClient;
@@ -21,6 +19,7 @@ public class TransferRESTTest {
 
     @Before
     public void setUp() throws Exception {
+        DB.cleanDB();
         RestServer.main(null);
         httpClient = new HttpClient();
         httpClient.start();

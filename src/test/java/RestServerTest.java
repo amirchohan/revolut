@@ -18,6 +18,7 @@ public class RestServerTest {
 
     @After
     public void tearDown() throws Exception {
+        RestServer.stop();
         httpClient.stop();
     }
 

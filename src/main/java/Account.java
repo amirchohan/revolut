@@ -143,4 +143,9 @@ class Account {
         sb.append("\r\n]\r\n}");
         return sb.toString();
     }
+
+    public void refundTransaction(Transaction transaction) {
+        balance = balance.add(transaction.getAmount());
+        transactions.remove(transaction);
+    }
 }

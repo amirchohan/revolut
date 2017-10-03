@@ -4,6 +4,7 @@ import java.util.List;
 
 final class DB {
 
+    //using hashtable since they are thread-safe
     private static Hashtable<Integer, Account> accounts = new Hashtable<>();
     private static Hashtable<Integer, Transaction> transactions = new Hashtable<>();
 
@@ -41,5 +42,10 @@ final class DB {
 
     public static List<Account> getAccounts() {
         return new LinkedList<>(accounts.values());
+    }
+
+    public static void cleanDB() {
+        accounts = new Hashtable<>();
+        transactions = new Hashtable<>();
     }
 }

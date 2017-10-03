@@ -38,8 +38,16 @@ class Transaction {
 
         Account sourceAcc = DB.getAccount(sourceAccId);
         Account destAcc = DB.getAccount(destAccId);
+
         sourceAcc.withdraw(this);
-        destAcc.deposit(this);
+        try {
+            destAcc.deposit(this);
+        }
+        catch (Exception e) {
+            //if can't deposit money into the beneficiary's account then refund into the payee's acc
+            sourceAcc.refundTransaction(this);
+            throw e;
+        }
         successful = true;
     }
 

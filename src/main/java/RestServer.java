@@ -30,8 +30,10 @@ final class RestServer {
     }
 
     public static void main(String[] args) {
-        Account.createDemoAccounts(8);
-        Transaction.createDummyTransactions();
+        if (args != null && args[0].equals("-demo")) {
+            Account.createDemoAccounts(8);
+            Transaction.createDummyTransactions();
+        }
 
         server = Undertow.builder()
                 .addHttpListener(PORT, HOSTNAME)
